@@ -52,6 +52,9 @@ def is_armstrong(n: int) -> bool:
         return False
     num_str = str(n)
     length = len(num_str)
+    # Explicitly handle single-digit numbers and zero
+    if length == 1:
+        return n == 0  # Only 0 is considered Armstrong in single-digit
     return sum(int(digit)**length for digit in num_str) == n
 
 async def get_fun_fact(n: int) -> str:
