@@ -8,7 +8,7 @@ A FastAPI implementation for HNG Stage 1 DevOps Task
 - External API integration (NumbersAPI)
 
 ## Deployment
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+[![Deploy to Railway](Railway)](https://web-production-114b.up.railway.app/)
 
 ## API Documentation
 Visit `/docs` endpoint for interactive documentation
