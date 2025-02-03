@@ -2,14 +2,11 @@
 """
 Entry point to my application
 """
-
 from fastapi import FastAPI, Query, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import httpx
-
 app = FastAPI()
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,7 +14,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 def is_prime(n: int) -> bool:
     if n <= 1:
         return False
@@ -33,7 +29,6 @@ def is_prime(n: int) -> bool:
         i += j
         j = 6 - j
     return True
-
 def is_perfect(n: int) -> bool:
     if n <= 1:
         return False
@@ -45,7 +40,6 @@ def is_perfect(n: int) -> bool:
             if i != n // i:
                 sum_divisors += n // i
     return sum_divisors == n
-
 def is_armstrong(n: int) -> bool:
     """Check if a number is an Armstrong number (narcissistic number)"""
     if n < 0:
@@ -53,7 +47,6 @@ def is_armstrong(n: int) -> bool:
     num_str = str(n)
     length = len(num_str)
     return sum(int(digit) ** length for digit in num_str) == n
-
 async def get_fun_fact(n: int) -> str:
     try:
         async with httpx.AsyncClient() as client:
@@ -64,32 +57,27 @@ async def get_fun_fact(n: int) -> str:
             return response.text if response.status_code == 200 else "No fun fact available"
     except (httpx.RequestError, httpx.TimeoutException):
         return "No fun fact available"
-
 @app.get("/api/classify-number", response_model=dict)
 async def classify_number(number: str = Query(..., description="Number to classify")):
     try:
         num = int(number)
     except ValueError:
         return JSONResponse(
-            content={"number": number, "error": True},
+            content={"number": number, "error": True, "message": "Invalid input. Please provide an integer."},
             status_code=status.HTTP_400_BAD_REQUEST
         )
-
-    armstrong = is_armstrong(num)
-    parity = "even" if num % 2 == 0 else "odd"
-
     properties = []
-    if armstrong:
+    if is_prime(num):
+        properties.append("prime")
+    if is_perfect(num):
+        properties.append("perfect")
+    if is_armstrong(num):
         properties.append("armstrong")
-    properties.append(parity)
-
+    properties.append("even" if num % 2 == 0 else "odd")
     fun_fact = await get_fun_fact(num)
-
     return {
         "number": num,
-        "is_prime": is_prime(num),
-        "is_perfect": is_perfect(num),
         "properties": properties,
-        "digit_sum": sum(int(d) for d in str(abs(num))),
+        "digit_sum": sum(int(d) for d in str(abs(num))),  # Ensure digit_sum is always positive
         "fun_fact": fun_fact
     }
